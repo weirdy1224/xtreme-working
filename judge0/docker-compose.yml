@@ -1,0 +1,52 @@
+################################################################################
+# Judge0 Docker Compose - server + worker + redis
+################################################################################
+
+x-logging:
+  &default-logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100M
+
+services:
+  server:
+    image: judge0/judge0:latest
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    ports:
+      - "2358:2358"
+    privileged: true
+    <<: *default-logging
+    restart: always
+    environment:
+      DATABASE_URL: "postgresql://codeflow:codeflow123@<postgres>:5432/codeflow"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "redis_testing@123"
+
+  worker:
+    image: judge0/judge0:latest
+    command: ["./scripts/workers"]
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    privileged: true
+    <<: *default-logging
+    restart: always
+    environment:
+      DATABASE_URL: "postgresql://codeflow:codeflow123@<postgres>:5432/codeflow"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "redis_testing@123"
+
+  redis:
+    image: redis:7.2.4
+    command: >
+      bash -c "docker-entrypoint.sh --appendonly no --requirepass redis_testing@123"
+    <<: *default-logging
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

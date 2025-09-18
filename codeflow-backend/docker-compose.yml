@@ -1,0 +1,152 @@
+version: '3.9'
+
+x-logging:
+  &default-logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100M
+
+services:
+  # App Database (Postgres for Prisma/Node)
+  postgres:
+    image: postgres:15
+    container_name: codeflow-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: codeflow
+      POSTGRES_PASSWORD: codeflow123
+      POSTGRES_DB: codeflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - codeflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codeflow -d codeflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin (to manage both DBs)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: codeflow-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@codeflow.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      judge0-postgres:
+        condition: service_healthy
+    networks:
+      - codeflow-network
+
+  # Redis
+  redis:
+    image: redis:7.2.4
+    container_name: codeflow-redis
+    command: >
+      redis-server --appendonly no --requirepass redis_testing@123
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - codeflow-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_testing@123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Judge0 Database (separate from app DB)
+  judge0-postgres:
+    image: postgres:15
+    container_name: judge0-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0123
+      POSTGRES_DB: judge0
+    volumes:
+      - judge0_postgres_data:/var/lib/postgresql/data
+    networks:
+      - codeflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U judge0 -d judge0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Judge0 Server
+  server:
+    image: judge0/judge0:latest
+    container_name: codeflow-judge0-server
+    restart: always
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      DATABASE_URL: "postgresql://judge0:judge0123@judge0-postgres:5432/judge0"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "redis_testing@123"
+      PORT: 2358
+    ports:
+      - "2358:2358"
+    volumes:
+      - judge0_box:/box:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./judge0.conf:/judge0.conf:ro
+    depends_on:
+      judge0-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - codeflow-network
+
+  # Judge0 Worker
+  worker:
+    image: judge0/judge0
+    container_name: codeflow-judge0-worker
+    restart: always
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    command: ["./scripts/workers"]
+    environment:
+      DATABASE_URL: "postgresql://judge0:judge0123@judge0-postgres:5432/judge0"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "redis_testing@123"
+    volumes:
+      - judge0_box:/box:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./judge0.conf:/judge0.conf:ro
+    depends_on:
+      judge0-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - codeflow-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  judge0_postgres_data:
+  judge0_box:
+
+networks:
+  codeflow-network:
+    driver: bridge
