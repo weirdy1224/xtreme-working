@@ -1,9 +1,6 @@
+// Updated submitCode and runCode
 import { db } from '../libs/db.js';
-import {
-  getLanguageName,
-  pollBatchResults,
-  submitBatch,
-} from '../libs/judge0.js';
+import { getLanguageName, pollBatchResults, submitBatch } from '../libs/judge0.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { Status } from '../generated/prisma/index.js';
 import { ApiResponse } from '../utils/api-response.js';
@@ -12,7 +9,7 @@ import { ErrorCodes } from '../utils/constants.js';
 
 /**
  * SUBMIT CODE
- * - Runs against ALL testcases
+ * - Runs against ALL testcases (public + hidden)
  * - Saves submission + testcase results to DB
  * - Marks problem solved if all pass
  */
@@ -23,7 +20,7 @@ const submitCode = asyncHandler(async (req, res) => {
   // 1. Validate problem + fetch testcases
   const problem = await db.problem.findUnique({
     where: { id: problemId },
-    select: { testcases: true },
+    select: { publicTestcases: true, hiddenTestcases: true },
   });
 
   if (!problem) {
@@ -32,7 +29,12 @@ const submitCode = asyncHandler(async (req, res) => {
     });
   }
 
-  const testcases = problem.testcases || [];
+  // Combine public + hidden testcases
+  const testcases = [
+    ...(problem.publicTestcases || []),
+    ...(problem.hiddenTestcases || []),
+  ];
+
   if (testcases.length === 0) {
     throw new ApiError(400, 'No testcases available for this problem', {
       code: ErrorCodes.NO_TESTCASES_AVAILABLE,
@@ -57,24 +59,14 @@ const submitCode = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Judge0 execution failed');
   }
 
-  console.log('🔥 Raw Judge0 results (submitCode):', JSON.stringify(results, null, 2));
-
   // 4. Analyze results
   let allPassed = true;
   const detailedResults = results.map((result, i) => {
     const stdout = result.stdout ? result.stdout.trim() : '';
-    const expected_output = testcases[i].output
-      ? String(testcases[i].output).trim()
-      : '';
+    const expected_output = testcases[i].output ? String(testcases[i].output).trim() : '';
 
     const passed = stdout === expected_output;
     if (!passed) allPassed = false;
-
-    console.log(`🔎 Testcase #${i + 1}`);
-    console.log('   Input:', testcases[i].input);
-    console.log('   Expected:', expected_output);
-    console.log('   Got:', stdout);
-    console.log('   Passed?', passed);
 
     return {
       testCase: i + 1,
@@ -117,17 +109,9 @@ const submitCode = asyncHandler(async (req, res) => {
   // 6. Mark problem solved if all passed
   if (allPassed) {
     await db.problemSolved.upsert({
-      where: {
-        userId_problemId: {
-          userId,
-          problemId,
-        },
-      },
+      where: { userId_problemId: { userId, problemId } },
       update: {},
-      create: {
-        userId,
-        problemId,
-      },
+      create: { userId, problemId },
     });
   }
 
@@ -145,9 +129,7 @@ const submitCode = asyncHandler(async (req, res) => {
     time: result.time,
   }));
 
-  await db.testCaseResult.createMany({
-    data: testCaseResults,
-  });
+  await db.testCaseResult.createMany({ data: testCaseResults });
 
   // 8. Return submission + testcases
   const submissionWithTestCase = await db.submission.findUnique({
@@ -162,7 +144,7 @@ const submitCode = asyncHandler(async (req, res) => {
 
 /**
  * RUN CODE
- * - Quick run for ALL testcases
+ * - Quick run for ALL testcases (public only)
  * - Does not save to DB
  */
 const runCode = asyncHandler(async (req, res) => {
@@ -171,7 +153,7 @@ const runCode = asyncHandler(async (req, res) => {
   // 1. Validate problem + fetch testcases
   const problem = await db.problem.findUnique({
     where: { id: problemId },
-    select: { testcases: true },
+    select: { publicTestcases: true },
   });
 
   if (!problem) {
@@ -180,7 +162,7 @@ const runCode = asyncHandler(async (req, res) => {
     });
   }
 
-  const testcases = problem.testcases || [];
+  const testcases = problem.publicTestcases || [];
   if (testcases.length === 0) {
     throw new ApiError(400, 'No testcases available for this problem', {
       code: ErrorCodes.NO_TESTCASES_AVAILABLE,
@@ -205,24 +187,14 @@ const runCode = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Judge0 execution failed');
   }
 
-  console.log('🔥 Raw Judge0 results (runCode):', JSON.stringify(results, null, 2));
-
   // 4. Analyze results
   let allPassed = true;
   const detailedResults = results.map((result, i) => {
     const stdout = result.stdout ? result.stdout.trim() : '';
-    const expected_output = testcases[i].output
-      ? String(testcases[i].output).trim()
-      : '';
+    const expected_output = testcases[i].output ? String(testcases[i].output).trim() : '';
 
     const passed = stdout === expected_output;
     if (!passed) allPassed = false;
-
-    console.log(`🔎 Run Testcase #${i + 1}`);
-    console.log('   Input:', testcases[i].input);
-    console.log('   Expected:', expected_output);
-    console.log('   Got:', stdout);
-    console.log('   Passed?', passed);
 
     return {
       id: `run-${problemId}-${i + 1}-${Date.now()}`,

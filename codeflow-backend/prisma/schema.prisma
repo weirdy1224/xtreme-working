@@ -48,6 +48,8 @@ model User {
   refreshToken                 String?
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
+  rank                         Int?      @default(0)
+  problemsSolvedCount          Int       @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,11 +66,11 @@ model Problem {
   difficulty         Difficulty
   tags               String[]
   userId             String
-  examples           Json
+  examples           Json       // will be validated as an array (2-3 items) in backend
   constraints        String
-  hints              String?
   editorial          String?
-  testcases          Json
+  publicTestcases    Json       // required - exactly 3 public testcases
+  hiddenTestcases    Json?      // optional - array of hidden testcases
   codeSnippets       Json
 
   createdAt DateTime @default(now())

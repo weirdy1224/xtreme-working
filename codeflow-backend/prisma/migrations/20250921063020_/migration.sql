@@ -7,6 +7,9 @@ CREATE TYPE "Difficulty" AS ENUM ('EASY', 'MEDIUM', 'HARD');
 -- CreateEnum
 CREATE TYPE "Status" AS ENUM ('ACCEPTED', 'WRONG_ANSWER');
 
+-- CreateEnum
+CREATE TYPE "Language" AS ENUM ('JAVA', 'PYTHON', 'C', 'CPP');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -25,6 +28,8 @@ CREATE TABLE "User" (
     "refreshToken" TEXT,
     "emailVerificationToken" TEXT,
     "emailVerificationTokenExpiry" TIMESTAMP(3),
+    "rank" INTEGER DEFAULT 0,
+    "problemsSolvedCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -41,9 +46,9 @@ CREATE TABLE "Problem" (
     "userId" TEXT NOT NULL,
     "examples" JSONB NOT NULL,
     "constraints" TEXT NOT NULL,
-    "hints" TEXT,
     "editorial" TEXT,
-    "testcases" JSONB NOT NULL,
+    "publicTestcases" JSONB NOT NULL,
+    "hiddenTestcases" JSONB,
     "codeSnippets" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -57,7 +62,7 @@ CREATE TABLE "Submission" (
     "userId" TEXT NOT NULL,
     "problemId" TEXT NOT NULL,
     "sourceCode" JSONB NOT NULL,
-    "language" TEXT NOT NULL,
+    "language" "Language" NOT NULL,
     "stdin" TEXT,
     "stdout" TEXT,
     "stderr" TEXT,

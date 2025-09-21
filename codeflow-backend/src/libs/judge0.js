@@ -48,7 +48,6 @@ export const submitBatch = async (submissions) => {
             ? { headers: rapidApiHeaders }
             : undefined
     );
-    console.log('Submission Results: ', data);
     return data;
 };
 

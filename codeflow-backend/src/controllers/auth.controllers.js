@@ -392,7 +392,6 @@ const logoutUser = asyncHandler(async (req, res) => {
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies?.refreshToken;
 
-    console.log(refreshToken);
 
     if (!refreshToken) {
         throw new ApiError(401, 'No refresh token', {

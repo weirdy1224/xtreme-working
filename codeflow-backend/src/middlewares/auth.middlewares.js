@@ -5,10 +5,9 @@ import { ApiError } from '../utils/api-error.js';
 import { db } from '../libs/db.js';
 
 export const isLoggedIn = asyncHandler(async (req, res, next) => {
-    console.log(req.cookies);
+    
 
     const accessToken = req.cookies?.accessToken;
-    console.log(accessToken);
 
     if (!accessToken) {
         throw new ApiError(401, 'Unauthorized request', {

@@ -17,100 +17,76 @@ const createProblem = asyncHandler(async (req, res) => {
     tags,
     examples,
     constraints,
-    testcases,
+    editorial,
+    publicTestcases,
+    hiddenTestcases,
     codeSnippets,
     userId,
   } = req.body;
-  console.log('Received data:', req.body);
-  // Optional: Enforce admin access if required
-  // if (!req.user || req.user.role !== 'ADMIN') {
-  //   throw new ApiError(403, 'Admin access only', {
-  //     code: ErrorCodes.UNAUTHORIZED_ACCESS,
-  //   });
-  // }
 
-  // Validate required fields
-  if (!title || !description || !difficulty || !userId || !testcases || !codeSnippets) {
+  console.log('Received data:', req.body);
+
+  // Basic required fields
+  if (!title || !description || !difficulty || !userId || !publicTestcases || !codeSnippets || !examples) {
     throw new ApiError(400, 'Missing required fields');
   }
 
-  // Validate supported languages
+  // Validate supported languages in codeSnippets
   const supportedLanguages = ['PYTHON', 'JAVA', 'C', 'CPP'];
-  const providedLanguages = Object.keys(codeSnippets);
+  const providedLanguages = Object.keys(codeSnippets || {});
   const invalidLanguages = providedLanguages.filter(lang => !supportedLanguages.includes(lang.toUpperCase()));
   if (invalidLanguages.length > 0) {
     throw new ApiError(400, `Unsupported languages: ${invalidLanguages.join(', ')}`);
   }
 
-  // Optional validation of codeSnippets against testcases
-//   for (const language of supportedLanguages) {
-//     if (codeSnippets[language]) {
-//       const languageId = getJudge0LanguageId(language);
-//       if (!languageId) {
-//         throw new ApiError(400, `Language ${language} is not supported`, {
-//           code: ErrorCodes.PROBLEM_UNSUPPORTED_LANGUAGE,
-//         });
-//       }
+  // Validate examples server-side (2-3)
+  if (!Array.isArray(examples) || examples.length < 2 || examples.length > 3) {
+    throw new ApiError(400, 'Provide between 2 and 3 examples in total', { code: ErrorCodes.INVALID_PAYLOAD });
+  }
+  for (const ex of examples) {
+    if (typeof ex.input !== 'string' || typeof ex.output !== 'string' || ex.output.trim().length === 0) {
+      throw new ApiError(400, 'Each example must have string input and non-empty output', { code: ErrorCodes.INVALID_PAYLOAD });
+    }
+  }
 
-//       const submissions = testcases.map(({ input, output }) => ({
-//         source_code: codeSnippets[language],
-//         language_id: languageId,
-//         stdin: input,
-//         expected_output: output,
-//       }));
+  // publicTestcases must be exactly 3
+  if (!Array.isArray(publicTestcases) || publicTestcases.length !== 3) {
+    throw new ApiError(400, 'Exactly 3 public testcases are required', { code: ErrorCodes.INVALID_PAYLOAD });
+  }
+  for (const tc of publicTestcases) {
+    if (typeof tc.input !== 'string' || typeof tc.output !== 'string' || tc.output.trim().length === 0) {
+      throw new ApiError(400, 'Each public testcase must have string input and non-empty output', { code: ErrorCodes.INVALID_PAYLOAD });
+    }
+  }
 
-//       if (!submissions.length) {
-//         throw new ApiError(
-//           400,
-//           `No valid testcases found for ${language}`,
-//           { code: ErrorCodes.PROBLEM_SUBMISSION_ERROR }
-//         );
-//       }
+  // hiddenTestcases optional validation
+  if (hiddenTestcases) {
+    if (!Array.isArray(hiddenTestcases)) {
+      throw new ApiError(400, 'hiddenTestcases must be an array', { code: ErrorCodes.INVALID_PAYLOAD });
+    }
+    for (const tc of hiddenTestcases) {
+      if (typeof tc.input !== 'string' || typeof tc.output !== 'string' || tc.output.trim().length === 0) {
+        throw new ApiError(400, 'Each hidden testcase must have string input and non-empty output', { code: ErrorCodes.INVALID_PAYLOAD });
+      }
+    }
+  }
 
-//       console.log(`Language: ${language}, languageId: ${languageId}`);
-//       console.log('Submissions:', submissions);
+const newProblem = await db.problem.create({
+  data: {
+    title,
+    description,
+    difficulty,
+    tags,
+    examples, // store as array, not string
+    constraints,
+    editorial: editorial || null,
+    publicTestcases, // store as array
+    hiddenTestcases: hiddenTestcases || null,
+    codeSnippets, // store as object
+    userId: userId || req.user.id,
+  },
+});
 
-//       const submissionResults = await submitBatch(submissions);
-
-//       console.log(submissionResults);
-
-//       if (!submissionResults || !Array.isArray(submissionResults)) {
-//         throw new ApiError(
-//           500,
-//           `Failed to submit testcases for ${language}`,
-//           { code: ErrorCodes.JUDGE0_SUBMISSION_FAILED }
-//         );
-//       }
-
-//       const tokens = submissionResults.map((res) => res.token);
-//       const results = await pollBatchResults(tokens);
-
-//       for (let i = 0; i < results.length; i++) {
-//         const result = results[i];
-//         if (result.status.id !== 3) { // 3 = Accepted
-//           throw new ApiError(
-//             400,
-//             `Testcase ${i + 1} failed for language ${language}`,
-//             { code: ErrorCodes.PROBLEM_TESTCASE_FAILED }
-//           );
-//         }
-//       }
-//     }
-//   }
-
-  const newProblem = await db.problem.create({
-    data: {
-      title,
-      description,
-      difficulty,
-      tags,
-      examples: JSON.stringify(examples),
-      constraints,
-      testcases: JSON.stringify(testcases),
-      codeSnippets: JSON.stringify(codeSnippets),
-      userId: userId || req.user.id, // Use provided userId or authenticated user
-    },
-  });
 
   const response = new ApiResponse(
     201,
@@ -179,85 +155,32 @@ const updateProblem = asyncHandler(async (req, res) => {
     tags,
     examples,
     constraints,
-    testcases,
+    editorial,
+    publicTestcases,
+    hiddenTestcases,
     codeSnippets,
   } = req.body;
 
-  // Optional: Enforce admin access if required
-  // if (!req.user || req.user.role !== 'ADMIN') {
-  //   throw new ApiError(403, 'Admin access only', {
-  //     code: ErrorCodes.UNAUTHORIZED_ACCESS,
-  //   });
-  // }
-
-  // Validate required fields
-  if (!title || !description || !difficulty || !testcases || !codeSnippets) {
+  if (!title || !description || !difficulty || !publicTestcases || !codeSnippets) {
     throw new ApiError(400, 'Missing required fields');
   }
 
-  // Validate supported languages
   const supportedLanguages = ['PYTHON', 'JAVA', 'C', 'CPP'];
-  const providedLanguages = Object.keys(codeSnippets);
+  const providedLanguages = Object.keys(codeSnippets || {});
   const invalidLanguages = providedLanguages.filter(lang => !supportedLanguages.includes(lang.toUpperCase()));
   if (invalidLanguages.length > 0) {
     throw new ApiError(400, `Unsupported languages: ${invalidLanguages.join(', ')}`);
   }
 
-  // Optional validation of codeSnippets against testcases
-//   for (const language of supportedLanguages) {
-//     if (codeSnippets[language]) {
-//       const languageId = getJudge0LanguageId(language);
-//       if (!languageId) {
-//         throw new ApiError(400, `Language ${language} is not supported`, {
-//           code: ErrorCodes.PROBLEM_UNSUPPORTED_LANGUAGE,
-//         });
-//       }
+  // Server side examples validation
+  if (!Array.isArray(examples) || examples.length < 2 || examples.length > 3) {
+    throw new ApiError(400, 'Provide between 2 and 3 examples in total', { code: ErrorCodes.INVALID_PAYLOAD });
+  }
 
-//       const submissions = testcases.map(({ input, output }) => ({
-//         source_code: codeSnippets[language],
-//         language_id: languageId,
-//         stdin: input,
-//         expected_output: output,
-//       }));
-
-//       if (!submissions.length) {
-//         throw new ApiError(
-//           400,
-//           `No valid testcases found for ${language}`,
-//           { code: ErrorCodes.PROBLEM_SUBMISSION_ERROR }
-//         );
-//       }
-
-//       console.log(`Language: ${language}, languageId: ${languageId}`);
-//       console.log('Submissions:', submissions);
-
-//       const submissionResults = await submitBatch(submissions);
-
-//       console.log(submissionResults);
-
-//       if (!submissionResults || !Array.isArray(submissionResults)) {
-//         throw new ApiError(
-//           500,
-//           `Failed to submit testcases for ${language}`,
-//           { code: ErrorCodes.JUDGE0_SUBMISSION_FAILED }
-//         );
-//       }
-
-//       const tokens = submissionResults.map((res) => res.token);
-//       const results = await pollBatchResults(tokens);
-
-//       for (let i = 0; i < results.length; i++) {
-//         const result = results[i];
-//         if (result.status.id !== 3) { // 3 = Accepted
-//           throw new ApiError(
-//             400,
-//             `Testcase ${i + 1} failed for language ${language}`,
-//             { code: ErrorCodes.PROBLEM_TESTCASE_FAILED }
-//           );
-//         }
-//       }
-//     }
-//   }
+  // publicTestcases must be exactly 3
+  if (!Array.isArray(publicTestcases) || publicTestcases.length !== 3) {
+    throw new ApiError(400, 'Exactly 3 public testcases are required', { code: ErrorCodes.INVALID_PAYLOAD });
+  }
 
   const updatedProblem = await db.problem.update({
     where: { id },
@@ -268,7 +191,9 @@ const updateProblem = asyncHandler(async (req, res) => {
       tags,
       examples: JSON.stringify(examples),
       constraints,
-      testcases: JSON.stringify(testcases),
+      editorial: editorial || null,
+      public: JSON.stringify(publicTestcases),
+      hiddenTestcases: hiddenTestcases ? JSON.stringify(hiddenTestcases) : null,
       codeSnippets: JSON.stringify(codeSnippets),
     },
   });

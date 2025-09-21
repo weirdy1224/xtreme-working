@@ -29,24 +29,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # PgAdmin (to manage both DBs)
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: codeflow-pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@codeflow.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - "5050:80"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      judge0-postgres:
-        condition: service_healthy
-    networks:
-      - codeflow-network
-
   # Redis
   redis:
     image: redis:7.2.4

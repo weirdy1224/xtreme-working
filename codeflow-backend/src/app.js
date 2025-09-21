@@ -32,6 +32,8 @@ import authRouter from './routes/auth.routes.js';
 import problemRouter from './routes/problem.routes.js';
 import executionRouter from './routes/executeCode.routes.js';
 import submissionRouter from './routes/submission.routes.js';
+import leaderboardRouter from './routes/leaderboard.js';
+import statsRouter from './routes/stats.js';
 
 
 app.use('/api/v1/healthCheck', healthCheckRouter);
@@ -39,6 +41,8 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/problems', problemRouter);
 app.use('/api/v1/executeCode', executionRouter);
 app.use('/api/v1/submission', submissionRouter);
+app.use('/api/v1', leaderboardRouter);
+app.use('/api/v1', statsRouter);
 
 app.use(errorHandler);
 
