@@ -65,7 +65,7 @@ const SignUpPage = () => {
                   </motion.div>
                 </Link>
               </div>
-              <h1 className="text-xl font-bold text-white mb-1 lg:hidden">Join CodeFlow</h1>
+              <h1 className="text-xl font-bold text-white mb-1 lg:hidden">Join Athena</h1>
               <h1 className="text-xl font-bold text-white mb-1 hidden lg:block">Create Account</h1>
               <p className="text-white/70 text-xs lg:hidden">Create your account to start coding</p>
               <p className="text-white/70 text-xs hidden lg:block">Fill in your details to get started</p>
@@ -186,18 +186,6 @@ const SignUpPage = () => {
                 )}
               </div>
 
-              {/* Terms */}
-              <div className="text-xs text-white/60 leading-relaxed pt-2">
-                By signing up, you agree to our{" "}
-                <Link to="/terms" className="text-[#6c5ce7] hover:text-[#0984e3] transition-colors font-semibold">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link to="/privacy" className="text-[#6c5ce7] hover:text-[#0984e3] transition-colors font-semibold">
-                  Privacy Policy
-                </Link>
-              </div>
-
               {/* Submit Button */}
               <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -257,7 +245,7 @@ const SignUpPage = () => {
 
       {/* Right Side - Image/Pattern */}
       <AuthImagePattern
-        title={'Welcome to CodeFlow!'}
+        title={'Welcome to Athena!'}
         subtitle={
           'Sign up to access our platform and start using our services.'
         }

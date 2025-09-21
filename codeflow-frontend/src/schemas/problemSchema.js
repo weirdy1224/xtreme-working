@@ -1,4 +1,3 @@
-// schemas/problemSchema.js
 import { z } from 'zod';
 
 export const problemSchema = z.object({
@@ -7,51 +6,38 @@ export const problemSchema = z.object({
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
   tags: z.array(z.string()).min(1, 'At least one tag is required'),
   constraints: z.string().min(1, 'Constraints are required'),
-  hints: z.string().optional(),
   editorial: z.string().optional(),
-  testcases: z
+  publicTestcases: z
     .array(
       z.object({
         input: z.string().min(1, 'Input is required'),
         output: z.string().min(1, 'Output is required'),
       })
     )
-    .min(1, 'At least one test case is required'),
-  examples: z.object({
-    PYTHON: z
-      .object({
+    .length(3, 'Exactly 3 public test cases are required'),
+  hiddenTestcases: z
+    .array(
+      z.object({
+        input: z.string().min(1, 'Input is required'),
+        output: z.string().min(1, 'Output is required'),
+      })
+    )
+    .optional(),
+  examples: z
+    .array(
+      z.object({
         input: z.string().min(1, 'Input is required'),
         output: z.string().min(1, 'Output is required'),
         explanation: z.string().optional(),
       })
-      .optional(),
-    JAVA: z
-      .object({
-        input: z.string().min(1, 'Input is required'),
-        output: z.string().min(1, 'Output is required'),
-        explanation: z.string().optional(),
-      })
-      .optional(),
-    C: z
-      .object({
-        input: z.string().min(1, 'Input is required'),
-        output: z.string().min(1, 'Output is required'),
-        explanation: z.string().optional(),
-      })
-      .optional(),
-    CPP: z
-      .object({
-        input: z.string().min(1, 'Input is required'),
-        output: z.string().min(1, 'Output is required'),
-        explanation: z.string().optional(),
-      })
-      .optional(),
-  }),
+    )
+    .min(2, 'At least 2 examples are required')
+    .max(3, 'No more than 3 examples are allowed'),
   codeSnippets: z.object({
     PYTHON: z.string().min(1, 'Python code snippet is required'),
     JAVA: z.string().min(1, 'Java code snippet is required'),
     C: z.string().min(1, 'C code snippet is required'),
     CPP: z.string().min(1, 'C++ code snippet is required'),
   }),
-  userId: z.string().min(1, 'User ID is required'), // Added for Prisma
+  userId: z.string().min(1, 'User ID is required'),
 });

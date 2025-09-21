@@ -18,7 +18,6 @@ export const useAuthStore = create((set, get) => ({
     // Skip auth check if user just logged out to prevent race condition
     const { justLoggedOut } = get();
     if (justLoggedOut) {
-      console.log('🚫 Skipping checkAuth - user just logged out');
       set({ justLoggedOut: false, isCheckingAuth: false, hasAttemptedAuth: true }); // Reset flag & mark attempt
       return false;
     }
@@ -27,7 +26,6 @@ export const useAuthStore = create((set, get) => ({
     set({ isCheckingAuth: true });
     try {
       const res = await axiosInstance.get('/auth/profile');
-      console.log('Checkauth response: ', res.data);
 
       const userData = res.data.data;
 

@@ -59,7 +59,7 @@ export default function Header() {
                 textShadow: '0 1px 2px rgba(0,0,0,0.3)'
               }}
             >
-              CodeFlow
+              Athena
             </motion.span>
           </Link>
         </motion.div>
@@ -83,7 +83,7 @@ export default function Header() {
                 <Sparkles className="h-4 w-4" style={{ color: '#8b5cf6' }} />
               </motion.div>
               <span className="text-sm font-medium text-white/90">
-                Made for Developers
+                Mini Xtreme
               </span>
             </div>
             

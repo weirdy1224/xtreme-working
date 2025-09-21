@@ -88,6 +88,15 @@ const Navbar = ({ variant = 'top' }) => {
                 <span className="text-xs">Profile</span>
               </div>
             </Link>
+            <Link
+              to="/leaderboard"
+              className="flex items-center text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors duration-200"
+            >
+              <div className="flex flex-col items-center gap-1 px-2 py-2 w-full">
+                <User className="w-4 h-4" />
+                <span className="text-xs">Leaderboard</span>
+              </div>
+            </Link>
 
             {authUser?.role === 'ADMIN' && (
               <Link
@@ -162,7 +171,7 @@ const Navbar = ({ variant = 'top' }) => {
                     textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                   }}
                 >
-                  CodeFlow
+                  Icarus
                 </motion.span>
               </Link>
             </motion.div>
@@ -184,7 +193,7 @@ const Navbar = ({ variant = 'top' }) => {
                   <Sparkles className="h-4 w-4" style={{ color: '#8b5cf6' }} />
                 </motion.div>
                 <span className="text-sm font-medium text-white/90">
-                  Made for Developers
+                  Mini Xtreme
                 </span>
               </div>
               {/* Animated border glow */}
@@ -312,6 +321,20 @@ const Navbar = ({ variant = 'top' }) => {
                             <div className="font-medium">My Profile</div>
                             <div className="text-xs text-base-content/60">
                               View and edit profile
+                            </div>
+                          </div>
+                        </Link>
+                        <Link
+                          to="/leaderboard"
+                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-codeflow-purple/10 hover:to-codeflow-blue/10 hover:text-codeflow-purple transition-all duration-200 group"
+                        >
+                          <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
+                            <Trophy className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">Leaderboard</div>
+                            <div className="text-xs text-base-content/60">
+                              View the top users
                             </div>
                           </div>
                         </Link>

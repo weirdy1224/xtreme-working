@@ -1,14 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useProblemStore } from '../store/useProblemStore';
-import { Loader, Code, Target, TrendingUp, Users, Zap, BookOpen } from 'lucide-react';
+import { Code, Users } from 'lucide-react';
 import ProblemTable from '../components/ProblemTable';
+import { axiosInstance } from '../lib/axios';
 
 const Dashboard = () => {
   const { getAllProblems, problems, isProblemsLoading } = useProblemStore();
+  const [stats, setStats] = useState({ totalUsers: 0, totalProblems: 0 });
 
   useEffect(() => {
     getAllProblems();
+
+    const fetchStats = async () => {
+      try {
+        const res = await axiosInstance.get('/stats');
+        setStats(res.data.data || { totalUsers: 0, totalProblems: 0 });
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      }
+    };
+
+    fetchStats();
   }, [getAllProblems]);
 
   if (isProblemsLoading) {
@@ -32,12 +45,9 @@ const Dashboard = () => {
     );
   }
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-codeflow-dark via-base-300 to-base-200 px-4 py-8">
-      {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Background Elements */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-codeflow-purple/20 to-codeflow-blue/20 rounded-full blur-3xl opacity-60"></div>
         <div className="absolute top-20 right-1/4 w-80 h-80 bg-gradient-to-bl from-codeflow-blue/15 to-codeflow-purple/15 rounded-full blur-3xl opacity-50"></div>
         
@@ -49,29 +59,23 @@ const Dashboard = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              {/* <div className="p-3 bg-gradient-to-r from-codeflow-purple to-codeflow-blue rounded-xl">
-                <Zap className="w-8 h-8 text-white" />
-              </div> */}
-              <h1 className="text-5xl font-bold">
-                Welcome to
-                <span
-                    className="bg-gradient-to-r from-codeflow-purple to-codeflow-blue bg-clip-text text-transparent mr-0.5 pl-3"
-                    style={{
-                      background: 'linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text'
-                    }}
-                  >
-                    CodeFlow
-                  </span>
-              </h1>
-            </div>
+            <h1 className="text-5xl font-bold">
+              Welcome to
+              <span
+                className="bg-gradient-to-r from-codeflow-purple to-codeflow-blue bg-clip-text text-transparent mr-0.5 pl-3"
+                style={{
+                  background: 'linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                Athena
+              </span>
+            </h1>
 
             <p className="text-xl text-base-content/70 max-w-3xl mx-auto leading-relaxed">
-              Master coding interviews with our comprehensive platform. Practice problems,
-              track your progress, and elevate your programming skills.
+              Your gateway to coding excellence. Explore problems, track your progress, and climb the leaderboard!
             </p>
 
             {/* Small stats indicators */}
@@ -81,7 +85,7 @@ const Dashboard = () => {
                   <Code className="w-4 h-4 text-codeflow-purple" />
                 </div>
                 <div className="text-left">
-                  <p className="text-lg font-bold text-base-content">{problems?.length || 0}</p>
+                  <p className="text-lg font-bold text-base-content">{stats.totalProblems}</p>
                   <p className="text-xs text-base-content/60">Total Problems</p>
                 </div>
               </div>
@@ -91,7 +95,7 @@ const Dashboard = () => {
                   <Users className="w-4 h-4 text-yellow-400" />
                 </div>
                 <div className="text-left">
-                  <p className="text-lg font-bold text-base-content">1.2k</p>
+                  <p className="text-lg font-bold text-base-content">{stats.totalUsers}</p>
                   <p className="text-xs text-base-content/60">Active Users</p>
                 </div>
               </div>

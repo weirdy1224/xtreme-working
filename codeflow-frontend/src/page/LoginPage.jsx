@@ -154,16 +154,6 @@ const LogInPage = () => {
                 )}
               </div>
 
-              {/* Forgot Password */}
-              <div className="text-right">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-[#6c5ce7] hover:text-[#0984e3] transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
               {/* Submit Button */}
               <motion.div
                 whileHover={{ scale: 1.02 }}

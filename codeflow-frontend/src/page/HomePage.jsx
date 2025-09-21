@@ -63,7 +63,7 @@ const HomePage = () => {
                       backgroundClip: 'text'
                     }}
                   >
-                    CodeFlow
+                    IEEE Mini Xtreme
                   </span>
                 </motion.h1>
 
@@ -71,8 +71,7 @@ const HomePage = () => {
                   variants={itemVariants}
                   className="text-xl text-white/70 mb-8 leading-relaxed"
                 >
-                  A platform to master coding interviews through real-world
-                  challenges. Practice, learn, and grow.
+                  A platform to conduct coding competition . Practice, learn, and grow.
                 </motion.p>
               </div>
 
@@ -83,8 +82,7 @@ const HomePage = () => {
               >
                 {[
                   'Solve coding problems',
-                  'Track your progress',
-                  'Join weekly contests',
+                  'Compete with peers',
                 ].map((item, index) => (
                   <motion.li
                     key={item}
@@ -117,7 +115,7 @@ const HomePage = () => {
                       background: 'linear-gradient(90deg, #a78bfa 0%, #60a5fa 100%)'
                     }}
                   >
-                    Start Practicing
+                    Start Coding
                     <motion.div
                       className="ml-2"
                       animate={{ x: [0, 4, 0] }}
@@ -156,8 +154,7 @@ const HomePage = () => {
               How It Works
             </h2>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              Master coding interviews with our structured approach to learning
-              and practice
+              Submit coding problems and climb the leaderboard by solving challenges.
             </p>
           </motion.div>
 
@@ -165,7 +162,7 @@ const HomePage = () => {
             <FeatureCard
               icon={Code}
               title="Choose Problems"
-              description="Select from hundreds of coding challenges across different difficulty levels and topics."
+              description="Select from a variety of coding challenges across different difficulty levels and topics."
               delay={0}
             />
 
@@ -179,7 +176,7 @@ const HomePage = () => {
             <FeatureCard
               icon={TrendingUp}
               title="Track Progress"
-              description="Monitor your improvement with detailed analytics and personalized learning paths."
+              description="Monitor your ranks and points on the dynamic leaderboard."
               delay={0.2}
             />
 

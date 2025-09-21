@@ -8,7 +8,6 @@ import {
   MessageSquare,
   Lightbulb,
   Bookmark,
-  Share2,
   Clock,
   ChevronRight,
   BookOpen,
@@ -34,7 +33,7 @@ import { getLanguageId } from '../lib/lang';
 import { useExecutionStore } from '../store/useExecutionStore';
 import { useSubmissionStore } from '../store/useSubmissionStore';
 import Submission from '../components/Submission';
-import SubmissionsList from '../components/SubmissionList';
+import SubmissionsList from '@/components/SubmissionList';
 import ExecutionResults from '../components/ExecutionResults';
 
 const ProblemPage = () => {
@@ -71,46 +70,39 @@ const ProblemPage = () => {
   // Default starter templates
   const defaultCodeSnippets = {
     PYTHON: `# Write your Python code here
-n = int(input().strip())
-def solution(n):
+def solution():
     # Your solution logic here
     pass
-print(solution(n))`,
+`,
     JAVA: `import java.util.Scanner;
 
 public class Solution {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int n = Integer.parseInt(scanner.nextLine().trim());
-        int result = solution(n);
-        System.out.println(result);
+        // Your solution logic here
         scanner.close();
     }
-    static int solution(int n) {
+    static int solution() {
         // Your solution logic here
         return 0;
     }
 }`,
     C: `#include <stdio.h>
-int solution(int n) {
+int solution() {
     // Your solution logic here
     return 0;
 }
 int main() {
-    int n;
-    scanf("%d", &n);
-    printf("%d\\n", solution(n));
+    // Your solution logic here
     return 0;
 }`,
     CPP: `#include <iostream>
-int solution(int n) {
+int solution() {
     // Your solution logic here
     return 0;
 }
 int main() {
-    int n;
-    std::cin >> n;
-    std::cout << solution(n) << std::endl;
+    // Your solution logic here
     return 0;
 }`,
   };
@@ -127,7 +119,6 @@ int main() {
   }, [id]);
 
   useEffect(() => {
-    console.log('problem.testcases:', problem?.testcases, 'problem.codeSnippets:', problem?.codeSnippets);
     if (problem) {
       let parsedCodeSnippets = defaultCodeSnippets;
       try {
@@ -146,11 +137,11 @@ int main() {
 
       let parsedTestcases = [];
       try {
-        parsedTestcases = typeof problem.testcases === 'string' ? JSON.parse(problem.testcases) : problem.testcases || [];
+        parsedTestcases = typeof problem.publicTestcases === 'string' ? JSON.parse(problem.publicTestcases) : problem.publicTestcases || [];
       } catch (e) {
-        console.error('Failed to parse testcases:', e);
+        console.error('Failed to parse publicTestcases:', e);
       }
-      setTestCases(parsedTestcases.map((tc) => ({
+      setTestCases(parsedTestcases.slice(0, 3).map((tc) => ({
         input: tc.input,
         output: tc.output,
       })) || []);
@@ -162,8 +153,6 @@ int main() {
       getSubmissionForProblem(id);
     }
   }, [activeTab, id]);
-
-  console.log('submission', submissions);
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -177,32 +166,6 @@ int main() {
       console.error('Failed to parse codeSnippets:', e);
     }
     setCode(parsedCodeSnippets[lang] || defaultCodeSnippets[lang] || '');
-  };
-
-  const handleShareProblem = async () => {
-    try {
-      const currentUrl = window.location.href;
-      if (navigator.share) {
-        await navigator.share({
-          title: `CodeFlow - ${problem.title}`,
-          text: `Check out this coding problem: ${problem.title}`,
-          url: currentUrl,
-        });
-        toast.success('Problem shared successfully!');
-      } else {
-        await navigator.clipboard.writeText(currentUrl);
-        toast.success('Problem URL copied to clipboard!');
-      }
-    } catch (error) {
-      console.log('Sharing failed:', error);
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success('Problem URL copied to clipboard!');
-      } catch (clipboardError) {
-        console.log('Clipboard copy also failed:', clipboardError);
-        toast.error('Failed to share problem. Please try again.');
-      }
-    }
   };
 
   const handleSubmitCode = (e) => {
@@ -313,7 +276,7 @@ int main() {
                 <h3 className="text-lg font-bold text-base-content">Test Cases</h3>
               </div>
               <span className="text-xs text-base-content/60">
-                {testcases.length} test cases
+                3 test cases
               </span>
             </div>
             <div className="overflow-x-auto px-4 pb-4">
@@ -375,47 +338,45 @@ int main() {
               <div className="mb-8">
                 <h3 className="text-lg font-bold mb-4 text-codeflow-purple">Examples:</h3>
                 <div className="space-y-6">
-                  {Object.entries(problem.examples).map(
-                    ([lang, example], idx) => (
-                      <motion.div
-                        key={lang}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="bg-gradient-to-r from-base-200/50 to-base-300/30 p-6 rounded-xl border border-white/10 backdrop-blur-sm"
-                      >
-                        <div className="mb-4">
-                          <div className="text-codeflow-blue mb-2 text-sm font-semibold flex items-center gap-2">
-                            <Terminal className="w-4 h-4" />
-                            Input:
-                          </div>
-                          <code className="bg-black/50 px-4 py-2 rounded-lg font-mono text-green-400 block">
-                            {example.input}
-                          </code>
+                  {(Array.isArray(problem.examples) ? problem.examples : []).slice(0, 3).map((example, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="bg-gradient-to-r from-base-200/50 to-base-300/30 p-6 rounded-xl border border-white/10 backdrop-blur-sm"
+                    >
+                      <div className="mb-4">
+                        <div className="text-codeflow-blue mb-2 text-sm font-semibold flex items-center gap-2">
+                          <Terminal className="w-4 h-4" />
+                          Input:
                         </div>
-                        <div className="mb-4">
-                          <div className="text-codeflow-blue mb-2 text-sm font-semibold flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4" />
-                            Output:
-                          </div>
-                          <code className="bg-black/50 px-4 py-2 rounded-lg font-mono text-green-400 block">
-                            {example.output}
-                          </code>
+                        <code className="bg-black/50 px-4 py-2 rounded-lg font-mono text-green-400 block">
+                          {example.input}
+                        </code>
+                      </div>
+                      <div className="mb-4">
+                        <div className="text-codeflow-blue mb-2 text-sm font-semibold flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4" />
+                          Output:
                         </div>
-                        {example.explanation && (
-                          <div>
-                            <div className="text-yellow-400 mb-2 text-sm font-semibold flex items-center gap-2">
-                              <Lightbulb className="w-4 h-4" />
-                              Explanation:
-                            </div>
-                            <p className="text-base-content/80 text-sm leading-relaxed bg-black/30 p-3 rounded-lg">
-                              {example.explanation}
-                            </p>
+                        <code className="bg-black/50 px-4 py-2 rounded-lg font-mono text-green-400 block">
+                          {example.output}
+                        </code>
+                      </div>
+                      {example.explanation && (
+                        <div>
+                          <div className="text-yellow-400 mb-2 text-sm font-semibold flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4" />
+                            Explanation:
                           </div>
-                        )}
-                      </motion.div>
-                    )
-                  )}
+                          <p className="text-base-content/80 text-sm leading-relaxed bg-black/30 p-3 rounded-lg">
+                            {example.explanation}
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             )}
@@ -429,18 +390,28 @@ int main() {
                 </div>
               </div>
             )}
-            {problem.topics && (
+            {problem.tags && (
               <div className="mb-6">
-                <h3 className="text-lg font-bold mb-4 text-codeflow-purple">Topics:</h3>
+                <h3 className="text-lg font-bold mb-4 text-codeflow-purple">Tags:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {problem.topics.map((topic) => (
+                  {problem.tags.map((tag) => (
                     <span
-                      key={topic}
+                      key={tag}
                       className="px-3 py-1 bg-gradient-to-r from-codeflow-purple/20 to-codeflow-blue/20 text-codeflow-purple rounded-full text-sm font-medium border border-codeflow-purple/30"
                     >
-                      {topic}
+                      {tag}
                     </span>
                   ))}
+                </div>
+              </div>
+            )}
+            {problem.editorial && (
+              <div className="mb-6">
+                <h3 className="text-lg font-bold mb-4 text-codeflow-purple">Editorial:</h3>
+                <div className="bg-gradient-to-r from-base-200/50 to-base-300/30 p-6 rounded-xl border border-white/10">
+                  <p className="text-base-content/80 text-sm leading-relaxed">
+                    {problem.editorial}
+                  </p>
                 </div>
               </div>
             )}
@@ -453,20 +424,10 @@ int main() {
             isLoading={isSubmissionsLoading}
           />
         );
-      case 'discussion':
-        return (
-          <div className="p-8 text-center">
-            <MessageSquare className="w-16 h-16 text-base-content/30 mx-auto mb-4" />
-            <p className="text-base-content/70 text-lg">No discussions yet</p>
-            <p className="text-base-content/50 text-sm mt-2">
-              Be the first to start a discussion!
-            </p>
-          </div>
-        );
       case 'hints':
         return (
           <div className="p-4">
-            {problem?.hints ? (
+            {problem?.editorial ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -474,16 +435,16 @@ int main() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Lightbulb className="w-5 h-5 text-yellow-400" />
-                  <h4 className="text-lg font-semibold text-yellow-400">Hint</h4>
+                  <h4 className="text-lg font-semibold text-yellow-400">Editorial</h4>
                 </div>
                 <p className="text-base-content/80 leading-relaxed">
-                  {problem.hints}
+                  {problem.editorial}
                 </p>
               </motion.div>
             ) : (
               <div className="text-center text-base-content/70 p-8">
                 <Lightbulb className="w-16 h-16 text-base-content/30 mx-auto mb-4" />
-                <p className="text-lg">No hints available</p>
+                <p className="text-lg">No editorial available</p>
                 <p className="text-sm mt-2 text-base-content/50">
                   Try to solve it on your own first!
                 </p>
@@ -556,16 +517,6 @@ int main() {
                 />
               </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="btn btn-ghost btn-circle btn-sm sm:btn-md text-base-content/60 hover:text-codeflow-blue"
-                onClick={handleShareProblem}
-                title="Share this problem"
-              >
-                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              </motion.button>
-
               <select
                 className="px-3 py-1 rounded-lg bg-base-200/90 hover:bg-base-200 border border-base-300/60 hover:border-codeflow-purple/50 text-base-content text-xs transition-colors duration-200 focus:border-codeflow-purple focus:ring-1 focus:ring-codeflow-purple/20 focus:outline-none backdrop-blur-sm min-w-[80px]"
                 value={selectedLanguage}
@@ -595,8 +546,7 @@ int main() {
                 {[
                   { key: 'description', icon: FileText, label: 'Description' },
                   { key: 'submissions', icon: Code2, label: 'Submissions' },
-                  { key: 'discussion', icon: MessageSquare, label: 'Discussion' },
-                  { key: 'hints', icon: Lightbulb, label: 'Hints' },
+                  { key: 'hints', icon: Lightbulb, label: 'Editorial' },
                 ].map(({ key, icon: Icon, label }) => (
                   <button
                     key={key}

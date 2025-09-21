@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Eye,
-} from 'lucide-react';
-
+import { Eye } from 'lucide-react';
 import CodeViewModal from './CodeViewModal';
 
 const SubmissionsList = ({ submissions, isLoading }) => {
@@ -13,6 +10,7 @@ const SubmissionsList = ({ submissions, isLoading }) => {
     setSelectedSubmission(submission);
     setIsCodeModalOpen(true);
   };
+
   // Helper function to safely parse JSON strings
   const safeParse = (data) => {
     if (!data || data === null || data === undefined) {
@@ -37,12 +35,10 @@ const SubmissionsList = ({ submissions, isLoading }) => {
         if (!m || typeof m !== 'string') return 0;
         return parseFloat(m.split(' ')[0]) || 0;
       })
-      .filter(val => !isNaN(val));
+      .filter((val) => !isNaN(val));
 
     if (memoryArray.length === 0) return 0;
-    return (
-      memoryArray.reduce((acc, curr) => acc + curr, 0) / memoryArray.length
-    );
+    return memoryArray.reduce((acc, curr) => acc + curr, 0) / memoryArray.length;
   };
 
   // Helper function to calculate average runtime
@@ -55,7 +51,7 @@ const SubmissionsList = ({ submissions, isLoading }) => {
         if (!t || typeof t !== 'string') return 0;
         return parseFloat(t.split(' ')[0]) || 0;
       })
-      .filter(val => !isNaN(val));
+      .filter((val) => !isNaN(val));
 
     if (timeArray.length === 0) return 0;
     return timeArray.reduce((acc, curr) => acc + curr, 0) / timeArray.length;
@@ -111,7 +107,7 @@ const SubmissionsList = ({ submissions, isLoading }) => {
                   hour: '2-digit',
                   minute: '2-digit',
                   second: '2-digit',
-                  hour12: false
+                  hour12: false,
                 })}
               </div>
 
@@ -125,19 +121,13 @@ const SubmissionsList = ({ submissions, isLoading }) => {
               </div>
 
               {/* Language */}
-              <div className="text-base-content">
-                {submission.language}
-              </div>
+              <div className="text-base-content">{submission.language}</div>
 
               {/* Runtime */}
-              <div className="text-base-content/70">
-                {avgTime.toFixed(2)}ms
-              </div>
+              <div className="text-base-content/70">{avgTime.toFixed(2)}ms</div>
 
               {/* Memory */}
-              <div className="text-base-content/70">
-                {(avgMemory / 1000).toFixed(2)}MB
-              </div>
+              <div className="text-base-content/70">{(avgMemory / 1000).toFixed(2)}MB</div>
 
               {/* Code - View Button */}
               <div>
@@ -162,9 +152,7 @@ const SubmissionsList = ({ submissions, isLoading }) => {
                   ) : (
                     <span className="text-error font-medium text-sm">Wrong Answer</span>
                   )}
-                  <span className="badge badge-neutral badge-sm">
-                    {submission.language}
-                  </span>
+                  <span className="badge badge-neutral badge-sm">{submission.language}</span>
                 </div>
                 <button
                   onClick={() => handleViewCode(submission)}
@@ -185,7 +173,7 @@ const SubmissionsList = ({ submissions, isLoading }) => {
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: false
+                    hour12: false,
                   })}
                 </div>
                 <div className="flex gap-4">

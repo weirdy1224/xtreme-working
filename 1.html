@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Synapse 2.0 - LEGO Heroes Unite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', cursive;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        /* LEGO Brick Textures and Patterns */
+        .lego-brick {
+            position: relative;
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D, #4ECDC4, #45B7D1);
+            background-size: 400% 400%;
+            animation: legoGlow 8s ease infinite;
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4),
+                inset 0 2px 4px rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+
+        @keyframes legoGlow {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 50% 0%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 100%; }
+        }
+
+        .lego-brick::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            box-shadow: 
+                -25px 0 0 8px rgba(255,255,255,0.3),
+                25px 0 0 8px rgba(255,255,255,0.3),
+                -50px 0 0 6px rgba(255,255,255,0.2),
+                50px 0 0 6px rgba(255,255,255,0.2);
+        }
+
+        /* Marvel/DC Hero Figures */
+        .hero-figure {
+            position: absolute;
+            width: 120px;
+            height: 150px;
+            background: linear-gradient(145deg, #FF4757, #FF3742);
+            border-radius: 15px 15px 30px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .hero-figure.batman {
+            background: linear-gradient(145deg, #2C2C54, #1A1A2E);
+        }
+
+        .hero-figure.superman {
+            background: linear-gradient(145deg, #0F4C75, #3282B8);
+        }
+
+        .hero-figure.spiderman {
+            background: linear-gradient(145deg, #DC143C, #B22222);
+        }
+
+        .hero-figure.ironman {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+        }
+
+        .hero-figure::before {
+            content: '🦸';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            z-index: 1;
+        }
+
+        .hero-figure.batman::before { content: '🦇'; }
+        .hero-figure.superman::before { content: '🔵'; }
+        .hero-figure.spiderman::before { content: '🕷️'; }
+        .hero-figure.ironman::before { content: '⚡'; }
+
+        /* Parallax Container */
+        .parallax-scene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header Hero Section */
+        .hero-header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,107,107,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(78,205,196,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 60% 20%, rgba(255,217,61,0.1) 0%, transparent 50%);
+            animation: heroBackground 20s linear infinite;
+        }
+
+        @keyframes heroBackground {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #FF6B6B, #FFD93D, #4ECDC4, #45B7D1);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleShine 4s ease-in-out infinite;
+            text-shadow: 0 0 50px rgba(255,255,255,0.3);
+        }
+
+        @keyframes titleShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-date {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        /* Countdown Timer in Hero */
+        .hero-countdown {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .countdown-block {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            min-width: 120px;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-block:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(255,107,107,0.3);
+        }
+
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+            background: linear-gradient(45deg, #FF6B6B, #FFD93D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Main Content Sections */
+        .content-section {
+            padding: 120px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            text-align: center;
+            margin-bottom: 80px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* About Section */
+        .about-content {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(30px);
+            border-radius: 40px;
+            padding: 60px;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+        }
+
+        /* Events Carousel */
+        .events-carousel-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .events-carousel {
+            display: flex;
+            gap: 30px;
+            padding: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .events-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .event-card {
+            min-width: 350px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .event-card:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .event-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            border-color: rgba(255,107,107,0.4);
+        }
+
+        .event-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .event-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .event-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Modal/Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(20,20,30,0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+            transform: scale(0.7) translateY(50px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #FF6B6B, #FFD93D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .modal-poster {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .modal-details h4 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #FFD93D;
+        }
+
+        .modal-register-btn {
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 40px rgba(255,107,107,0.4);
+        }
+
+        .modal-register-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(255,107,107,0.6);
+        }
+
+        .modal-description {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            margin: 25px 0;
+            opacity: 0.9;
+        }
+
+        .modal-coordinators {
+            margin-top: 30px;
+        }
+
+        .modal-coordinator {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-coordinator:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateX(5px);
+        }
+
+        .modal-coordinator-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* Coordinators Section */
+        .coordinators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .coordinator-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: all 0.4s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .coordinator-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            border-color: rgba(255,107,107,0.3);
+        }
+
+        .coordinator-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .coordinator-card h4 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .coordinator-position {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+            color: #4ECDC4;
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(255,107,107,0.3);
+        }
+
+        .faq-question {
+            padding: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .faq-answer {
+            padding: 0 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            opacity: 0.9;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 30px;
+            max-height: 300px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+            color: #FFD93D;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-countdown {
+                gap: 15px;
+            }
+
+            .countdown-block {
+                min-width: 90px;
+                padding: 20px 15px;
+            }
+
+            .countdown-number {
+                font-size: 2.2rem;
+            }
+
+            .content-section {
+                padding: 80px 20px;
+            }
+
+            .about-content {
+                padding: 40px;
+            }
+
+            .event-card {
+                min-width: 280px;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .lego-loader {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #FF6B6B, #FFD93D);
+            border-radius: 15px;
+            animation: legoSpin 1s ease-in-out infinite;
+        }
+
+        @keyframes legoSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loading">
+        <div class="lego-loader"></div>
+    </div>
+
+    <!-- Parallax Scene with Hero Figures -->
+    <div class="parallax-scene" id="parallaxScene">
+        <div class="hero-figure batman" style="top: 20%; left: 10%; animation: float 6s ease-in-out infinite;"></div>
+        <div class="hero-figure superman" style="top: 60%; right: 15%; animation: float 8s ease-in-out infinite reverse;"></div>
+        <div class="hero-figure spiderman" style="top: 30%; right: 8%; animation: float 7s ease-in-out infinite;"></div>
+        <div class="hero-figure ironman" style="top: 70%; left: 20%; animation: float 9s ease-in-out infinite reverse;"></div>
+    </div>
+
+    <!-- Hero Header Section -->
+    <section class="hero-header" id="hero">
+        <h1 class="hero-title">CYBER SYNAPSE 2.0</h1>
+        <div class="hero-date">17 Oct, 2025</div>
+
+        <div class="hero-countdown" id="heroCountdown">
+            <div class="countdown-block lego-brick">
+                <span class="countdown-number" id="days">00</span>
+                <span class="countdown-label">Days</span>
+            </div>
+            <div class="countdown-block lego-brick">
+                <span class="countdown-number" id="hours">00</span>
+                <span class="countdown-label">Hours</span>
+            </div>
+            <div class="countdown-block lego-brick">
+                <span class="countdown-number" id="minutes">00</span>
+                <span class="countdown-label">Minutes</span>
+            </div>
+            <div class="countdown-block lego-brick">
+                <span class="countdown-number" id="seconds">00</span>
+                <span class="countdown-label">Seconds</span>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down" style="font-size: 2rem;"></i>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="content-section" id="about">
+        <h2 class="section-title">About Cyber Synapse 2.0</h2>
+        <div class="about-content lego-brick">
+            <p>Welcome to Cyber Synapse 2.0, where technology meets heroism! Just like LEGO superheroes unite to save the world, our event brings together brilliant minds to tackle the challenges of tomorrow.</p>
+            <br>
+            <p>Our prestigious institution has been nurturing technological heroes for over two decades, creating innovators who shape the digital universe. Cyber Synapse 2.0 represents our mission to build a community where students can assemble their skills, much like building the perfect LEGO creation.</p>
+            <br>
+            <p>Join us for an epic adventure featuring cutting-edge competitions, inspiring workshops, and networking opportunities that will transform you into the tech hero you're meant to be!</p>
+        </div>
+    </section>
+
+    <!-- Events Section with Carousel -->
+    <section class="content-section" id="events">
+        <h2 class="section-title">Hero Challenges</h2>
+        <div class="events-carousel-container">
+            <div class="events-carousel" id="eventsCarousel">
+                <div class="event-card" onclick="openModal('aiChallenge')">
+                    <span class="event-icon">🤖</span>
+                    <h3>AI Challenge</h3>
+                    <p>Harness artificial intelligence like Tony Stark's JARVIS. Build intelligent systems that can think, learn, and adapt.</p>
+                </div>
+
+                <div class="event-card" onclick="openModal('codeSprint')">
+                    <span class="event-icon">⚡</span>
+                    <h3>Code Sprint</h3>
+                    <p>Channel the speed of The Flash in our ultimate coding competition. Race through algorithms faster than lightning!</p>
+                </div>
+
+                <div class="event-card" onclick="openModal('webWizardry')">
+                    <span class="event-icon">🕸️</span>
+                    <h3>Web Wizardry</h3>
+                    <p>Weave web applications like Spider-Man spins his webs. Create stunning, responsive digital experiences.</p>
+                </div>
+
+                <div class="event-card" onclick="openModal('designThinking')">
+                    <span class="event-icon">💡</span>
+                    <h3>Design Thinking</h3>
+                    <p>Think like Batman's strategic mind. Solve complex problems with innovative design solutions and creative thinking.</p>
+                </div>
+
+                <div class="event-card" onclick="openModal('techTalk')">
+                    <span class="event-icon">🎤</span>
+                    <h3>Tech Talk</h3>
+                    <p>Inspire like Superman's speeches. Share your knowledge and motivate the next generation of tech heroes.</p>
+                </div>
+
+                <div class="event-card" onclick="openModal('innovationPitch')">
+                    <span class="event-icon">🚀</span>
+                    <h3>Innovation Pitch</h3>
+                    <p>Present your ideas like pitching to the Justice League. Transform visionary concepts into world-changing solutions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Modals -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Event Details</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Coordinators Section -->
+    <section class="content-section" id="coordinators">
+        <h2 class="section-title">Our Hero League</h2>
+
+        <h3 style="color: white; font-size: 2.5rem; margin-bottom: 40px; text-align: center; color: #FFD93D;">Staff Coordinators</h3>
+        <div class="coordinators-grid">
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">DN</div>
+                <h4>Dr. Nisha Sharma</h4>
+                <div class="coordinator-position">Faculty Coordinator</div>
+                <div style="opacity: 0.8;">+91 99887 76655</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">AM</div>
+                <h4>Prof. Amit Mishra</h4>
+                <div class="coordinator-position">Technical Advisor</div>
+                <div style="opacity: 0.8;">+91 88776 65544</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">SK</div>
+                <h4>Dr. Sunita Kumari</h4>
+                <div class="coordinator-position">Event Supervisor</div>
+                <div style="opacity: 0.8;">+91 77665 54433</div>
+            </div>
+        </div>
+
+        <h3 style="color: white; font-size: 2.5rem; margin: 80px 0 40px; text-align: center; color: #4ECDC4;">Event Coordinators</h3>
+        <div class="coordinators-grid">
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">AK</div>
+                <h4>Arjun Kapoor</h4>
+                <div class="coordinator-position">Head Coordinator</div>
+                <div style="opacity: 0.8;">+91 66554 43322</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">SP</div>
+                <h4>Shruti Patel</h4>
+                <div class="coordinator-position">Technical Lead</div>
+                <div style="opacity: 0.8;">+91 55443 32211</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">VG</div>
+                <h4>Varun Goel</h4>
+                <div class="coordinator-position">Logistics Coordinator</div>
+                <div style="opacity: 0.8;">+91 44332 21100</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">MR</div>
+                <h4>Maya Reddy</h4>
+                <div class="coordinator-position">Marketing Head</div>
+                <div style="opacity: 0.8;">+91 33221 10099</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">KS</div>
+                <h4>Karan Sharma</h4>
+                <div class="coordinator-position">Registration Manager</div>
+                <div style="opacity: 0.8;">+91 22110 09988</div>
+            </div>
+            <div class="coordinator-card lego-brick">
+                <div class="coordinator-avatar">RP</div>
+                <h4>Ritika Puri</h4>
+                <div class="coordinator-position">Content Coordinator</div>
+                <div style="opacity: 0.8;">+91 11009 98877</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="content-section" id="faq">
+        <h2 class="section-title">Hero Manual (FAQ)</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What is Cyber Synapse 2.0?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Cyber Synapse 2.0 is an epic tech event inspired by LEGO superheroes! Featuring 6 heroic challenges - 3 technical (AI Challenge, Code Sprint, Web Wizardry) and 3 creative (Design Thinking, Tech Talk, Innovation Pitch) - designed to unleash your inner tech superhero.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How do I register for the hero challenges?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Click on any event card to view details, then hit the "Register Now" button in the popup. You can join multiple challenges to maximize your hero training! Registration closes on October 15th, 2025.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What are the participation fees?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Technical challenges (AI, Code Sprint, Web Wizardry) are ₹200 per hero. Creative challenges (Design Thinking, Tech Talk, Innovation Pitch) are ₹150 per hero. Team registrations unlock special hero discounts!
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Can I participate in multiple hero challenges?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Absolutely! True heroes master multiple skills. You can register for as many challenges as you want, but make sure you can handle the hero training schedule as some events may overlap.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What hero training do I need?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Most challenges welcome heroes of all levels! Technical challenges require basic programming powers, while creative challenges need innovative thinking abilities. Complete training materials will be provided in your hero handbook upon registration.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What rewards await the heroes?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    Heroes earn cash prizes, official certificates, and exclusive LEGO-themed merchandise! All participants receive hero completion certificates. Special awards recognize the most innovative solutions and inspiring presentations.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Event data for modals
+        const eventData = {
+            aiChallenge: {
+                title: "AI Challenge",
+                icon: "🤖",
+                description: "Channel your inner Tony Stark and build intelligent systems using cutting-edge AI technologies. Participants will work with machine learning frameworks to create innovative AI solutions that could rival JARVIS himself. From neural networks to deep learning, this challenge will test your ability to create truly intelligent systems.",
+                coordinators: [
+                    { name: "Dr. Rohan Sharma", phone: "+91 98765 43210", initials: "DR" },
+                    { name: "Arya Patel", phone: "+91 87654 32109", initials: "AP" }
+                ]
+            },
+            codeSprint: {
+                title: "Code Sprint",
+                icon: "⚡",
+                description: "Race like The Flash through our ultimate programming competition! Test your algorithmic thinking and coding speed as you solve complex problems under time pressure. From data structures to advanced algorithms, prove that you have the speed and precision of a superhero coder.",
+                coordinators: [
+                    { name: "Vikram Kumar", phone: "+91 76543 21098", initials: "VK" },
+                    { name: "Sneha Gupta", phone: "+91 65432 10987", initials: "SG" }
+                ]
+            },
+            webWizardry: {
+                title: "Web Wizardry",
+                icon: "🕸️",
+                description: "Spin web applications like Spider-Man weaves his web! Create stunning, responsive, and interactive web applications using modern frameworks and technologies. From frontend magic to backend sorcery, demonstrate your full-stack superpowers in this comprehensive challenge.",
+                coordinators: [
+                    { name: "Rahul Thakur", phone: "+91 54321 09876", initials: "RT" },
+                    { name: "Priya Mehta", phone: "+91 43210 98765", initials: "PM" }
+                ]
+            },
+            designThinking: {
+                title: "Design Thinking",
+                icon: "💡",
+                description: "Think strategically like Batman approaching a complex case. This creative problem-solving workshop focuses on human-centered design methodology and innovative solution development. Learn to identify problems, ideate solutions, and prototype like a true design superhero.",
+                coordinators: [
+                    { name: "Ankit Singh", phone: "+91 32109 87654", initials: "AS" },
+                    { name: "Kavya Joshi", phone: "+91 21098 76543", initials: "KJ" }
+                ]
+            },
+            techTalk: {
+                title: "Tech Talk",
+                icon: "🎤",
+                description: "Inspire others like Superman's motivational speeches! Present your technical expertise and innovative ideas to a diverse audience. Share your knowledge, inspire the next generation of technologists, and demonstrate your communication superpowers alongside your technical abilities.",
+                coordinators: [
+                    { name: "Manish Pandey", phone: "+91 10987 65432", initials: "MP" },
+                    { name: "Tanvi Agrawal", phone: "+91 09876 54321", initials: "TA" }
+                ]
+            },
+            innovationPitch: {
+                title: "Innovation Pitch",
+                icon: "🚀",
+                description: "Present your ideas to the Justice League of industry experts! Transform your visionary startup concepts and innovative solutions into compelling presentations. Get professional feedback, potential investment opportunities, and turn your superhero vision into reality.",
+                coordinators: [
+                    { name: "Ravi Verma", phone: "+91 98765 43210", initials: "RV" },
+                    { name: "Neha Sinha", phone: "+91 87654 32109", initials: "NS" }
+                ]
+            }
+        };
+
+        // Loading screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+
+        // Countdown Timer
+        function updateCountdown() {
+            const eventDate = new Date('2025-10-17T00:00:00').getTime();
+            const now = new Date().getTime();
+            const timeLeft = eventDate - now;
+
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Modal Functions
+        function openModal(eventKey) {
+            const event = eventData[eventKey];
+            const modal = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = event.title;
+
+            body.innerHTML = `
+                <div class="modal-poster">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">${event.icon}</div>
+                        <div style="font-size: 1.5rem;">${event.title}</div>
+                        <div style="font-size: 1rem; opacity: 0.8;">Official Poster</div>
+                    </div>
+                </div>
+                <div class="modal-details">
+                    <h4>Event Overview</h4>
+                    <button class="modal-register-btn" onclick="registerEvent('${eventKey}')">
+                        <i class="fas fa-rocket" style="margin-right: 10px;"></i>
+                        Register Now
+                    </button>
+                    <div class="modal-description">${event.description}</div>
+                    <div class="modal-coordinators">
+                        <h4>Hero Coordinators</h4>
+                        ${event.coordinators.map(coord => `
+                            <div class="modal-coordinator">
+                                <div class="modal-coordinator-photo">${coord.initials}</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 1.2rem; margin-bottom: 5px;">${coord.name}</div>
+                                    <div style="opacity: 0.8;">${coord.phone}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function registerEvent(eventKey) {
+            alert(`Registration for ${eventData[eventKey].title} will open soon! Contact the coordinators for early registration details.`);
+        }
+
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+
+        // Parallax Scrolling
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.getElementById('parallaxScene');
+            const rate = scrolled * 0.5;
+
+            parallax.style.transform = `translateY(${rate}px)`;
+
+            // Animate hero figures
+            const figures = document.querySelectorAll('.hero-figure');
+            figures.forEach((figure, index) => {
+                const speed = (index + 1) * 0.2;
+                figure.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+
+        // Smooth scroll reveal animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.content-section, .event-card, .coordinator-card, .faq-item').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                el.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                observer.observe(el);
+            });
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeModal();
+            }
+        });
+
+        // Add floating animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(5deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
