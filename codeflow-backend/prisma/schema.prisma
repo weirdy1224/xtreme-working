@@ -22,7 +22,17 @@ enum Difficulty {
 enum Status {
   ACCEPTED
   WRONG_ANSWER
+  COMPILATION_ERROR
+  RUNTIME_ERROR
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  ILLEGAL_SYSTEM_CALL
+  INTERNAL_ERROR
+  IN_QUEUE
+  COMPILING
+  RUNNING
 }
+
 
 enum Language {
   JAVA
@@ -83,10 +93,10 @@ model Problem {
 }
 
 model Submission {
-  id            String  @id @default(uuid())
+  id            String   @id @default(uuid())
   userId        String
   problemId     String
-  sourceCode    Json
+  sourceCode    String   // <-- changed from Json → String
   language      Language
   stdin         String?
   stdout        String?

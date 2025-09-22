@@ -7,34 +7,36 @@ import {
 } from 'lucide-react';
 
 const SubmissionResults = ({ submission }) => {
-  // Parse stringified arrays
-  const memoryArr = JSON.parse(submission.memory || '[]');
-  const timeArr = JSON.parse(submission.time || '[]');
+  if (!submission) return null; // render nothing if no submission
 
-  // Calculate averages
-  const avgMemory =
-    memoryArr
-      .map((m) => parseFloat(m)) // remove ' KB' using parseFloat
-      .reduce((a, b) => a + b, 0) / memoryArr.length;
+  // use submission.testResults from backend
+  const testCases = submission.testResults || [];
 
-  const avgTime =
-    timeArr
-      .map((t) => parseFloat(t)) // remove ' s' using parseFloat
-      .reduce((a, b) => a + b, 0) / timeArr.length;
+  // Parse stringified arrays if they exist
+  const memoryArr = testCases.map(tc => parseFloat(tc.memory) || 0);
+  const timeArr = testCases.map(tc => parseFloat(tc.time) || 0);
 
-  const passedTests = submission.testCases.filter((tc) => tc.passed).length;
-  const totalTests = submission.testCases.length;
-  const successRate = (passedTests / totalTests) * 100;
+  const avgMemory = memoryArr.length
+    ? memoryArr.reduce((a, b) => a + b, 0) / memoryArr.length
+    : 0;
+
+  const avgTime = timeArr.length
+    ? timeArr.reduce((a, b) => a + b, 0) / timeArr.length
+    : 0;
+
+  const passedTests = testCases.filter(tc => tc.passed).length;
+  const totalTests = testCases.length;
+  const successRate = totalTests ? (passedTests / totalTests) * 100 : 0;
 
   return (
     <div className="space-y-3 p-4">
-      {/* Overall Status - Compact Layout */}
+      {/* Overall Status */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="bg-base-200/50 p-2 rounded-lg border border-white/10">
           <div className="text-xs text-base-content/60">Status</div>
           <div
             className={`text-sm font-semibold ${
-              submission.status === 'ACCEPTED' ? 'text-success' : 'text-error'
+              submission.status === 'Accepted' ? 'text-success' : 'text-error'
             }`}
           >
             {submission.status}
@@ -63,7 +65,7 @@ const SubmissionResults = ({ submission }) => {
         </div>
       </div>
 
-      {/* Test Cases Results - Compact Table */}
+      {/* Test Cases */}
       <div className="bg-base-100/30 rounded-lg border border-white/10">
         <div className="p-3 border-b border-white/10">
           <h3 className="text-sm font-semibold text-base-content">Test Results</h3>
@@ -80,10 +82,10 @@ const SubmissionResults = ({ submission }) => {
               </tr>
             </thead>
             <tbody>
-              {submission.testCases.map((testCase) => (
-                <tr key={testCase.id} className="hover:bg-base-200/20">
+              {testCases.map(tc => (
+                <tr key={tc.id} className="hover:bg-base-200/20">
                   <td className="py-1">
-                    {testCase.passed ? (
+                    {tc.passed ? (
                       <div className="flex items-center gap-1 text-success">
                         <CheckCircle2 className="w-3 h-3" />
                         <span className="text-xs">Pass</span>
@@ -95,14 +97,14 @@ const SubmissionResults = ({ submission }) => {
                       </div>
                     )}
                   </td>
-                  <td className="font-mono text-xs max-w-24 truncate" title={testCase.expected}>
-                    {testCase.expected}
+                  <td className="font-mono text-xs max-w-24 truncate" title={tc.expected}>
+                    {tc.expected}
                   </td>
-                  <td className="font-mono text-xs max-w-24 truncate" title={testCase.stdout || 'null'}>
-                    {testCase.stdout || 'null'}
+                  <td className="font-mono text-xs max-w-24 truncate" title={tc.stdout || 'null'}>
+                    {tc.stdout || 'null'}
                   </td>
-                  <td className="text-xs">{testCase.memory}</td>
-                  <td className="text-xs">{testCase.time}</td>
+                  <td className="text-xs">{tc.memory}</td>
+                  <td className="text-xs">{tc.time}</td>
                 </tr>
               ))}
             </tbody>

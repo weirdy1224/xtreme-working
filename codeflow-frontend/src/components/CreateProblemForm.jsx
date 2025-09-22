@@ -46,7 +46,7 @@ const sampledpData = {
     C: '#include <stdio.h>\nint main() {\n    return 0;\n}',
     CPP: '#include <iostream>\nint main() {\n    return 0;\n}',
   },
-  userId: '4fecb2dd-aaad-4e54-8819-73805d06f06e', // Placeholder; replace with auth user ID
+  userId: 'c9940f62-c0ca-4b05-8a27-844bcd87054c', // Placeholder; replace with auth user ID
 };
 
 const sampleStringProblem = {
@@ -76,7 +76,7 @@ const sampleStringProblem = {
     C: '#include <stdbool.h>\nbool isPalindrome(char * s) { return false; }',
     CPP: 'bool isPalindrome(string s) { return false; }',
   },
-  userId: '4fecb2dd-aaad-4e54-8819-73805d06f06e', // Placeholder
+  userId: 'c9940f62-c0ca-4b05-8a27-844bcd87054c', // Placeholder
 };
 
 const CreateProblemForm = () => {

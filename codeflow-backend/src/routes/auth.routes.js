@@ -12,11 +12,6 @@ import {
     logoutUser,
     updateUserDetails,
     updateUserAvatar,
-    googleLogin,
-    googleCallback,
-    completeGoogleSignup,
-    githubLogin,
-    githubCallback,
 } from '../controllers/auth.controllers.js';
 
 import { validate } from '../middlewares/validator.middlewares.js';
@@ -35,7 +30,6 @@ import {
 import {
     isLoggedIn,
     isAdmin,
-    verifyOAuthTempToken,
 } from '../middlewares/auth.middlewares.js';
 
 import { upload } from '../middlewares/multer.middlerwares.js';
@@ -82,14 +76,6 @@ router
         catchMulterError(upload.single('avatar')),
         updateUserAvatar
     );
-
-router.route('/google').get(googleLogin);
-router.route('/google/callback').get(googleCallback);
-router
-    .route('/google/complete')
-    .post(verifyOAuthTempToken, completeGoogleSignup);
-router.route('/github').get(githubLogin);
-router.route('/github/callback').get(githubCallback);
 
 router
     .route('/:userId')

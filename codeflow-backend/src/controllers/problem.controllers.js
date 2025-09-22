@@ -1,9 +1,4 @@
 import { db } from '../libs/db.js';
-import {
-  getJudge0LanguageId,
-  pollBatchResults,
-  submitBatch,
-} from '../libs/judge0.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { ErrorCodes } from '../utils/constants.js';
 import { ApiResponse } from '../utils/api-response.js';
@@ -71,22 +66,21 @@ const createProblem = asyncHandler(async (req, res) => {
     }
   }
 
-const newProblem = await db.problem.create({
-  data: {
-    title,
-    description,
-    difficulty,
-    tags,
-    examples, // store as array, not string
-    constraints,
-    editorial: editorial || null,
-    publicTestcases, // store as array
-    hiddenTestcases: hiddenTestcases || null,
-    codeSnippets, // store as object
-    userId: userId || req.user.id,
-  },
-});
-
+  const newProblem = await db.problem.create({
+    data: {
+      title,
+      description,
+      difficulty,
+      tags,
+      examples, // store as array, not string
+      constraints,
+      editorial: editorial || null,
+      publicTestcases, // store as array
+      hiddenTestcases: hiddenTestcases || null,
+      codeSnippets, // store as object
+      userId: userId || req.user.id,
+    },
+  });
 
   const response = new ApiResponse(
     201,
@@ -189,12 +183,12 @@ const updateProblem = asyncHandler(async (req, res) => {
       description,
       difficulty,
       tags,
-      examples: JSON.stringify(examples),
+      examples, // Removed JSON.stringify to match createProblem
       constraints,
       editorial: editorial || null,
-      public: JSON.stringify(publicTestcases),
-      hiddenTestcases: hiddenTestcases ? JSON.stringify(hiddenTestcases) : null,
-      codeSnippets: JSON.stringify(codeSnippets),
+      publicTestcases, // Removed JSON.stringify to match createProblem
+      hiddenTestcases: hiddenTestcases || null,
+      codeSnippets, // Removed JSON.stringify to match createProblem
     },
   });
 
