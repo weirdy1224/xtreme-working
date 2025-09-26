@@ -8,6 +8,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//
+// ENUMS
+//
 enum Role {
   ADMIN
   USER
@@ -33,7 +36,6 @@ enum Status {
   RUNNING
 }
 
-
 enum Language {
   JAVA
   PYTHON
@@ -41,6 +43,9 @@ enum Language {
   CPP
 }
 
+//
+// MODELS
+//
 model User {
   id                           String    @id @default(uuid())
   avatarUrl                    String    @default("https://placehold.co/600x400")
@@ -64,30 +69,31 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // relations
   problems      Problem[]
   submission    Submission[]
   problemSolved ProblemSolved[]
 }
 
 model Problem {
-  id                 String     @id @default(uuid())
-  title              String
-  description        String
-  difficulty         Difficulty
-  tags               String[]
-  userId             String
-  examples           Json       // will be validated as an array (2-3 items) in backend
-  constraints        String
-  editorial          String?
-  publicTestcases    Json       // required - exactly 3 public testcases
-  hiddenTestcases    Json?      // optional - array of hidden testcases
-  codeSnippets       Json
+  id              String     @id @default(uuid())
+  title           String
+  description     String
+  difficulty      Difficulty
+  tags            String[]
+  userId          String
+  examples        Json       // validated as array (2–3 items) in backend
+  constraints     String
+  editorial       String?
+  publicTestcases Json       // required (exactly 3 public testcases)
+  hiddenTestcases Json?      // optional hidden testcases
+  codeSnippets    Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  // relations
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   submission Submission[]
   solvedBy   ProblemSolved[]
 }
@@ -96,7 +102,7 @@ model Submission {
   id            String   @id @default(uuid())
   userId        String
   problemId     String
-  sourceCode    String   // <-- changed from Json → String
+  sourceCode    String   // plain string (instead of Json)
   language      Language
   stdin         String?
   stdout        String?
@@ -109,9 +115,9 @@ model Submission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
+  // relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problem   @relation(fields: [problemId], references: [id], onDelete: Cascade)
   testCases TestCaseResult[]
 }
 
@@ -131,6 +137,7 @@ model TestCaseResult {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // relations
   Submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
@@ -140,9 +147,11 @@ model ProblemSolved {
   id        String   @id @default(uuid())
   userId    String
   problemId String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // relations
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 

@@ -148,11 +148,6 @@ int main() {
     }
   }, [problem, selectedLanguage, submission]);
 
-  useEffect(() => {
-    if (activeTab === 'submissions' && id) {
-      getSubmissionForProblem(id);
-    }
-  }, [activeTab, id]);
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -417,13 +412,6 @@ int main() {
             )}
           </motion.div>
         );
-      case 'submissions':
-        return (
-          <SubmissionsList
-            submissions={submissions}
-            isLoading={isSubmissionsLoading}
-          />
-        );
       case 'hints':
         return (
           <div className="p-4">
@@ -486,18 +474,6 @@ int main() {
                       {new Date(problem.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    <span className="whitespace-nowrap text-xs">
-                      {submissionCount} Submissions
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <ThumbsUp className="w-3 h-3" />
-                    <span className="whitespace-nowrap text-xs">
-                      {problem.acceptance || 95}% Success
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -545,7 +521,6 @@ int main() {
               <div className="tabs tabs-boxed bg-transparent px-3 py-2 border-b border-white/10">
                 {[
                   { key: 'description', icon: FileText, label: 'Description' },
-                  { key: 'submissions', icon: Code2, label: 'Submissions' },
                   { key: 'hints', icon: Lightbulb, label: 'Editorial' },
                 ].map(({ key, icon: Icon, label }) => (
                   <button
