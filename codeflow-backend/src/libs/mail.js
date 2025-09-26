@@ -6,8 +6,8 @@ export const sendMail = async (options) => {
         theme: 'default',
         product: {
             // Appears in header & footer of e-mails
-            name: 'Task Manager',
-            link: 'https://mailgen.js/',
+            name: 'Mini Xtreme 2.0',
+            link: 'https://edu.ieee.org/in-sairamit/',
             // Optional product logo
             // logo: 'https://mailgen.js/img/logo.png'
         },
@@ -27,7 +27,7 @@ export const sendMail = async (options) => {
     });
 
     const mail = {
-        from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
+        from: '"Mini Xtreme Event Coordination Team" <maddison53@ethereal.email>', // sender address
         to: options.email, // list of receivers
         subject: options.subject, // Subject line
         text: emailText, // plain text body
@@ -45,9 +45,9 @@ export const emailVerificationMailGenContent = (username, verificationUrl) => {
     return {
         body: {
             name: username,
-            intro: "Welcome to App! We're very excited to have you on board.",
+            intro: "Welcome to Athena! We're very excited to have you on board.",
             action: {
-                instructions: 'To get started with Our App, please click here:',
+                instructions: 'To get started with Mini Xtreme 2.0, please click here to verify your email:',
                 button: {
                     color: '#22BC66',
                     text: 'Verify your email',
@@ -59,21 +59,4 @@ export const emailVerificationMailGenContent = (username, verificationUrl) => {
     };
 };
 
-export const resetPasswordMailGenContent = (username, passwordResetUrl) => {
-    return {
-        body: {
-            name: username,
-            intro: 'You have received this email because a password reset request for your account was received.',
-            action: {
-                instructions: 'Click the button below to reset your password:',
-                button: {
-                    color: '#DC4D2F',
-                    text: 'Reset your password',
-                    link: passwordResetUrl,
-                },
-            },
-            outro: 'If you did not request a password reset, no further action is required.',
-        },
-    };
-};
 

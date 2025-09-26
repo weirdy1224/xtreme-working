@@ -1,0 +1,110 @@
+# CodeFlow Platform
+
+A full-stack coding platform that allows users to submit and run code, track problem-solving progress, and maintain a leaderboard. Built with **MERN stack**, **Prisma ORM**, and **Sphere Engine** integration for code execution.
+
+---
+
+## Features
+
+- User registration and authentication
+- Problem submission with support for multiple languages
+- Real-time code execution using Sphere Engine
+- Testcase evaluation and result tracking
+- Leaderboard based on problems solved
+- Admin dashboard to manage users and problems
+
+---
+
+## Tech Stack
+
+- **Backend:** Node.js, Express.js, Prisma, PostgreSQL
+- **Frontend:** React, Zustand (state management), Axios
+- **Other:** Sphere Engine API for code execution, Docker for backend deployment
+
+---
+
+## Setup Instructions
+
+### Backend
+
+1. Navigate to the backend folder:
+
+```bash
+cd codeflow-backend
+```
+
+2. Install dependencies (first time only):
+
+```bash
+npm i
+```
+
+3. Set up the database using Prisma:
+
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+4. Start the development server:
+
+```bash
+npm run dev
+```
+
+5. Open another terminal and go to codeflow-backend directory
+
+```bash
+docker-compose up -d
+```
+
+FOLDER STRUCTURE
+
+```bash
+/codeflow-backend
+ ├─ /libs           # Helper libraries
+ ├─ /generated      # Prisma generated client
+ ├─ /routes         # API routes
+ ├─ /controllers    # Controller logic
+ ├─ /utils          # Utility functions
+ └─ server.js       # Express server entry
+
+/codeflow-frontend
+ ├─ /src
+ │   ├─ /components  # React components
+ │   ├─ /store       # Zustand store
+ │   └─ App.jsx      # Main app
+ └─ package.json
+
+```
+
+.env FILE TEMPLATE
+
+```bash
+PORT=4000
+NODE_ENV=development
+DATABASE_URL=
+CORS_ORIGIN=http://localhost:3000
+CLIENT_URL=http://localhost:3000
+ACCESS_TOKEN_SECRET=
+REFRESH_TOKEN_SECRET=
+TEMP_TOKEN_SECRET=
+ACCESS_TOKEN_EXPIRY=1h
+REFRESH_TOKEN_EXPIRY=7d
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USER=
+MAIL_PASS=
+MAIL_FROM=
+SPHERE_ENGINE_ENDPOINT=
+SPHERE_ENGINE_TOKEN=
+```
+
+LICENSE
+
+MIT License
+```bash
+This includes everything: setup commands, `.env` variables, and usage instructions.  
+
+If you want, I can also **add a “Folder Structure” section** so someone cloning can immediately know where backend/frontend files are. It makes the README even more beginner-friendly. Do you want me to do that?
+```

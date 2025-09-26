@@ -113,26 +113,6 @@ const userIdValidator = () => {
     ];
 };
 
-const resetPasswordValidator = () => {
-    return [
-        param('token')
-            .exists()
-            .withMessage('Token param is required')
-            .isString()
-            .withMessage('Token must be a string')
-            .isLength({ min: 40, max: 80 }) // Typical hex token length (adjust as needed)
-            .withMessage('Invalid token format'),
-        body('password')
-            .exists({ checkFalsy: true })
-            .withMessage('You must type a password'),
-        body('confPassword')
-            .exists({ checkFalsy: true })
-            .withMessage('You must type a confirmation password')
-            .custom((value, { req }) => value === req.body.password)
-            .withMessage('The passwords do not match'),
-        // https://stackoverflow.com/questions/12548624/validate-a-password-with-express-validator
-    ];
-};
 export {
     userRegistrationValidator,
     updateUserValidator,
@@ -141,5 +121,4 @@ export {
     verifyEmailValidator,
     emailOnlyValidator,
     userIdValidator,
-    resetPasswordValidator,
 };

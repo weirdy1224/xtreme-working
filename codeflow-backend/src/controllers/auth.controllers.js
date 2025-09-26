@@ -6,7 +6,6 @@ import { asyncHandler } from '../utils/async-handler.js';
 import {
     sendMail,
     emailVerificationMailGenContent,
-    resetPasswordMailGenContent,
 } from '../libs/mail.js';
 import { ApiError } from '../utils/api-error.js';
 import { ErrorCodes } from '../utils/constants.js';
@@ -450,113 +449,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         201,
         { newAccessToken, newRefreshToken },
         'Tokens refreshed'
-    );
-
-    return res.status(response.statusCode).json(response);
-});
-
-const resetPasswordRequest = asyncHandler(async (req, res) => {
-    const { email } = req.body;
-
-    const user = await db.user.findUnique({
-        where: {
-            email,
-        },
-    });
-
-    console.log(user);
-
-    if (!user) {
-        throw new ApiError(401, 'Invalid Email. No user found', {
-            code: ErrorCodes.USER_NOT_FOUND,
-        });
-    }
-
-    const [unHashedToken, hashedToken, tokenExpiry] = generateTemporaryToken();
-
-    await db.user.update({
-        where: { id: user.id },
-        data: {
-            forgotPasswordToken: hashedToken,
-            forgotPasswordTokenExpiry: tokenExpiry,
-        },
-    });
-
-    const passwordResetUrl = `${process.env.BASE_URL}api/v1/auth/resetPassword/${unHashedToken}`;
-
-    await sendMail({
-        email: user.email,
-        subject: 'Password Reset Link',
-        mailGenContent: resetPasswordMailGenContent(
-            user.username,
-            passwordResetUrl
-        ),
-    });
-
-    const response = new ApiResponse(
-        200,
-        null,
-        'Reset password email sent. Please check your inbox.'
-    );
-
-    return res.status(response.statusCode).json(response);
-});
-
-const resetPassword = asyncHandler(async (req, res) => {
-    const { token } = req.params;
-
-    const { password, confPassword } = req.body;
-
-    if (password !== confPassword) {
-        console.log('No match');
-        throw new ApiError(400, 'Passwords do not match', {
-            code: ErrorCodes.PASSWORDS_DO_NOT_MATCH,
-        });
-    }
-
-    if (!token) {
-        console.log('Token missing');
-        throw new ApiError(400, 'Token is missing', {
-            code: ErrorCodes.TOKEN_MISSING,
-        });
-    }
-
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-    const user = await db.user.findFirst({
-        where: {
-            forgotPasswordToken: hashedToken,
-            forgotPasswordTokenExpiry: { gt: new Date() },
-        },
-    });
-
-    if (!user) {
-        console.log('Token invalid');
-        throw new ApiError(400, 'Invalid or expired token', {
-            code: ErrorCodes.TOKEN_INVALID,
-        });
-    }
-
-    if (user.forgotPasswordTokenExpiry < Date.now()) {
-        console.log('Token expired');
-        throw new ApiError(400, 'Token has expired', {
-            code: ErrorCodes.TOKEN_EXPIRED,
-        });
-    }
-
-    const updatedUser = await db.user.update({
-        where: { id: user.id },
-        data: {
-            password,
-            forgotPasswordToken: null,
-            forgotPasswordTokenExpiry: null,
-        },
-    });
-
-    const response = new ApiResponse(
-        201,
-        sanitize(updatedUser),
-        'Password changed successfully'
     );
 
     return res.status(response.statusCode).json(response);
@@ -1030,8 +922,6 @@ export {
     getUser,
     logoutUser,
     refreshAccessToken,
-    resetPasswordRequest,
-    resetPassword,
     updateUserDetails,
     updateUserAvatar,
     googleLogin,

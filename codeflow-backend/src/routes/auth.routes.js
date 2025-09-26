@@ -7,8 +7,6 @@ import {
     loginUser,
     getUser,
     refreshAccessToken,
-    resetPasswordRequest,
-    resetPassword,
     logoutUser,
     updateUserDetails,
     updateUserAvatar,
@@ -22,7 +20,6 @@ import {
     emailOnlyValidator,
     userLoginValidator,
     cookieBasedTokenValidator,
-    resetPasswordValidator,
     updateUserValidator,
     userIdValidator,
 } from '../validators/index.js';
@@ -59,12 +56,6 @@ router
 router
     .route('/refreshAccessToken')
     .get(cookieBasedTokenValidator(), validate, isLoggedIn, refreshAccessToken);
-router
-    .route('/forgotPassword')
-    .post(emailOnlyValidator(), validate, resetPasswordRequest);
-router
-    .route('/resetPassword/:token')
-    .post(resetPasswordValidator(), validate, resetPassword);
 router
     .route('/updateProfile')
     .post(updateUserValidator(), validate, isLoggedIn, updateUserDetails);

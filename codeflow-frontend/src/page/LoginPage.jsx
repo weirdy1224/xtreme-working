@@ -207,7 +207,7 @@ const LogInPage = () => {
 
       {/* Right Side - Image/Pattern */}
       <AuthImagePattern
-        title={'Welcome to Back!'}
+        title={'Welcome Back!'}
         subtitle={
           "Sign in to continue your journey with us. Don't have an account? Create one now."
         }

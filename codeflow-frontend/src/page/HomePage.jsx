@@ -53,7 +53,7 @@ const HomePage = () => {
                   variants={itemVariants}
                   className="mb-6 text-5xl font-bold tracking-tight lg:text-6xl"
                 >
-                  Welcome to{' '}
+                  Welcome to{<br />}
                   <span
                     className="bg-gradient-to-r from-codeflow-purple to-codeflow-blue bg-clip-text text-transparent mr-0.5 pl-3"
                     style={{
@@ -63,7 +63,7 @@ const HomePage = () => {
                       backgroundClip: 'text'
                     }}
                   >
-                    IEEE Mini Xtreme
+                    Athena
                   </span>
                 </motion.h1>
 
