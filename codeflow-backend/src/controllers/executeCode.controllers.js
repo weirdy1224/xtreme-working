@@ -17,11 +17,6 @@ function mapLanguage(language_id) {
     default: return Language.PYTHON;
   }
 }
-
-/**
- * SUBMIT CODE
- * Saves submission + testcases
- */
 export const submitCode = asyncHandler(async (req, res) => {
   const { source_code, language_id, problemId } = req.body;
   const userId = req.user?.id;
@@ -77,6 +72,7 @@ export const submitCode = asyncHandler(async (req, res) => {
 
   const allPassed = detailedResults.every(r => r.passed);
 
+  // Save submission
   const submissionRecord = await db.submission.create({
     data: {
       userId,
@@ -88,6 +84,27 @@ export const submitCode = asyncHandler(async (req, res) => {
     },
     include: { testCases: true },
   });
+
+  // Add to ProblemSolved if accepted
+  if (allPassed) {
+    try {
+      await db.problemSolved.upsert({
+        where: {
+          userId_problemId: {
+            userId,
+            problemId,
+          },
+        },
+        update: {}, // do nothing if already exists
+        create: {
+          userId,
+          problemId,
+        },
+      });
+    } catch (err) {
+      console.error('🔥 Failed to insert into ProblemSolved:', err);
+    }
+  }
 
   res.status(200).json(new ApiResponse(200, {
     allPassed,
@@ -125,25 +142,30 @@ export const runCode = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Sphere Engine execution failed');
   }
 
-  let allPassed = true;
-  const detailedResults = results.map((result, i) => {
-    const stdout = result.stdout?.trim() ?? '';
-    const expected_output = testcases[i].output ? String(testcases[i].output).trim() : '';
-    const passed = stdout === expected_output;
-    if (!passed) allPassed = false;
+const detailedResults = results.map((result, i) => {
+  const tc = testcases[i];
+  const stdout = result.stdout != null ? result.stdout.trim() : null;
+  const expected_output = tc.output ? String(tc.output).trim() : '';
+  const passed = stdout !== null && stdout === expected_output;
 
-    return {
-      testCase: i + 1,
-      passed,
-      stdout,
-      expected: expected_output,
-      stderr: result.stderr ?? null,
-      compileOutput: result.compile_output ?? null,
-      status: result.status?.description ?? 'Unknown',
-      memory: result.memory,
-      time: result.time,
-    };
-  });
+  if (stdout === null) {
+    console.warn(`⚠️ Testcase ${i + 1} returned no stdout for problem ${problemId}`);
+  }
+
+  return {
+    testCase: i + 1,
+    passed,
+    stdout,
+    expected: expected_output,
+    stderr: result.stderr ?? null,
+    compileOutput: result.compile_output ?? null,
+    status: result.status?.description ?? 'Unknown',
+    memory: result.memory,
+    time: result.time,
+  };
+});
+
+  const allPassed = detailedResults.every(r => r.passed);
 
   res.status(200).json(new ApiResponse(200, {
     allPassed,

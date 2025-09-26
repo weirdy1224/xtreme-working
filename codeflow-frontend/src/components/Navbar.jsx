@@ -171,7 +171,7 @@ const Navbar = ({ variant = 'top' }) => {
                     textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                   }}
                 >
-                  Icarus
+                  Athena
                 </motion.span>
               </Link>
             </motion.div>

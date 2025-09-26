@@ -1,0 +1,32 @@
+[
+  {
+    "stdout": "true",
+    "stderr": "",
+    "compile_output": "",
+    "status": {
+      "description": "Accepted"
+    },
+    "memory": "8.95703125 KB",
+    "time": "0.025744 s"
+  },
+  {
+    "stdout": "true",
+    "stderr": "",
+    "compile_output": "",
+    "status": {
+      "description": "Accepted"
+    },
+    "memory": "8.9765625 KB",
+    "time": "0.021941 s"
+  },
+  {
+    "stdout": "true",
+    "stderr": "",
+    "compile_output": "",
+    "status": {
+      "description": "Accepted"
+    },
+    "memory": "9.00390625 KB",
+    "time": "0.021671 s"
+  }
+]
