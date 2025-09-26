@@ -1,66 +1,58 @@
-# CodeFlow Platform
 
-A full-stack coding platform that allows users to submit and run code, track problem-solving progress, and maintain a leaderboard. Built with **MERN stack**, **Prisma ORM**, and **Sphere Engine** integration for code execution.
+# 🚀 CodeFlow Platform
 
----
-
-## Features
-
-- User registration and authentication
-- Problem submission with support for multiple languages
-- Real-time code execution using Sphere Engine
-- Testcase evaluation and result tracking
-- Leaderboard based on problems solved
-- Admin dashboard to manage users and problems
+A full-stack coding platform to submit and run code, track progress, and compete on a global leaderboard—built with **MERN stack**, **Prisma ORM**, and **Sphere Engine** integration.
 
 ---
 
-## Tech Stack
+## 🌟 Features
 
-- **Backend:** Node.js, Express.js, Prisma, PostgreSQL
-- **Frontend:** React, Zustand (state management), Axios
-- **Other:** Sphere Engine API for code execution, Docker for backend deployment
+- 🔐 User registration & authentication  
+- 📝 Problem submission with multiple languages  
+- ⚡ Real-time code execution (Sphere Engine)  
+- ✔️ Automated testcase evaluation & result tracking  
+- 🎯 Leaderboard: track problems solved  
+- 🛠️ Admin dashboard: manage users & problems  
 
 ---
 
-## Setup Instructions
+## 🛠 Tech Stack
+
+| Layer      | Technology                                     |
+|:-----------|:----------------------------------------------|
+| Backend    | Node.js, Express.js, Prisma, PostgreSQL        |
+| Frontend   | React, Zustand (state management), Axios       |
+| Other      | Sphere Engine API, Docker (backend deployment) |
+
+---
+
+## 🚧 Setup Instructions
 
 ### Backend
 
-1. Navigate to the backend folder:
-
-```bash
+```
+# 1. Go to the backend folder
 cd codeflow-backend
-```
 
-2. Install dependencies (first time only):
-
-```bash
+# 2. Install dependencies (first time only)
 npm i
-```
 
-3. Set up the database using Prisma:
-
-```bash
+# 3. Set up the database with Prisma
 npx prisma migrate dev
 npx prisma generate
-```
 
-4. Start the development server:
-
-```bash
+# 4. Start the development server
 npm run dev
-```
 
-5. Open another terminal and go to codeflow-backend directory
-
-```bash
+# 5. (In a new terminal) Start Docker services
 docker-compose up -d
 ```
 
-FOLDER STRUCTURE
+---
 
-```bash
+### Folder Structure
+
+```
 /codeflow-backend
  ├─ /libs           # Helper libraries
  ├─ /generated      # Prisma generated client
@@ -75,12 +67,15 @@ FOLDER STRUCTURE
  │   ├─ /store       # Zustand store
  │   └─ App.jsx      # Main app
  └─ package.json
-
 ```
 
-.env FILE TEMPLATE
+---
 
-```bash
+### 🌱 Environment Variables
+
+Create a `.env` file in your backend root using this template:
+
+```
 PORT=4000
 NODE_ENV=development
 DATABASE_URL=
@@ -100,11 +95,9 @@ SPHERE_ENGINE_ENDPOINT=
 SPHERE_ENGINE_TOKEN=
 ```
 
-LICENSE
+---
 
-MIT License
-```bash
-This includes everything: setup commands, `.env` variables, and usage instructions.  
+## 📄 License
 
-If you want, I can also **add a “Folder Structure” section** so someone cloning can immediately know where backend/frontend files are. It makes the README even more beginner-friendly. Do you want me to do that?
-```
+CodeFlow Platform is released under the MIT License.
+
